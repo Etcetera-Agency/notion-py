@@ -383,7 +383,10 @@ class CollectionRowBlock(PageBlock):
                 "Object does not have property '{}'".format(identifier)
             )
 
-        val = self.get(["properties", prop["id"]])
+        if prop['type'] in ["created_by", "last_edited_by"]:
+            val = self.get([f"{prop['type']}_id"])
+        else:
+            val = self.get(["properties", prop["id"]])
 
         return self._convert_notion_to_python(val, prop)
 
@@ -470,7 +473,7 @@ class CollectionRowBlock(PageBlock):
             val = self.get(prop["type"])
             val = datetime.utcfromtimestamp(val / 1000)
         if prop["type"] in ["created_by", "last_edited_by"]:
-            val = self.get(prop["type"])
+            val = self.get(f"{prop['type']}_id")
             val = self._client.get_user(val)
 
         return val

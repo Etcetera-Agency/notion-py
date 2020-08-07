@@ -1,4 +1,3 @@
-from notion import __version__
 from setuptools import setup, find_packages
 
 with open("README.md") as file:
@@ -13,9 +12,6 @@ with open("requirements.txt") as file:
 
 setup(
     name="notion-py",
-    version=__version__,
-    author="Artur Tamborski",
-    author_email="tamborskiartur@gmail.com",
     description="(Fork of) Unofficial Python API client for Notion.so",
     long_description=long_description,
     long_description_content_type="text/markdown",

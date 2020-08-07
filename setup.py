@@ -19,7 +19,7 @@ setup(
     description="(Fork of) Unofficial Python API client for Notion.so",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/arturtamborski/notion-py",
+    url="https://github.com/Etcetera-Agency/notion-py",
     install_requires=install_requires,
     include_package_data=True,
     packages=find_packages(),

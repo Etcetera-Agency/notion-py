@@ -12,6 +12,26 @@ from .settings import BASE_URL, SIGNED_URL_PREFIX, S3_URL_PREFIX, S3_URL_PREFIX_
 class InvalidNotionIdentifier(Exception):
     pass
 
+def auto_retry_lambda(fun, *args, **kwargs):
+
+    # making them function arguments would mess with *args and **kwargs if not always given
+    retries = 5
+    log = True
+    sleep = 1
+
+    while 1:
+        try:
+            return fun(*args, **kwargs)
+        
+        except Exception as e:
+            if log:
+                print("Retrying due to:" + str(e))
+
+            if retries <= 0:
+                raise e
+
+            retries -= 1
+            time.sleep(sleep)
 
 def now():
     return int(datetime.now().timestamp() * 1000)

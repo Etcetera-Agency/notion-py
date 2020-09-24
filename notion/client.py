@@ -24,7 +24,7 @@ from .settings import API_BASE_URL
 from .space import Space
 from .store import RecordStore
 from .user import User
-from .utils import extract_id, now
+from .utils import extract_id, now, auto_retry_lambda
 
 
 def create_session():
@@ -188,7 +188,10 @@ class NotionClient(object):
         response.raise_for_status()
         return response
 
-    def submit_transaction(self, operations, update_last_edited=True):
+    def submit_transaction(self, operations, update_last_edited = True):
+        return auto_retry_lambda(_submit_transaction, operations, update_last_edited)
+
+    def _submit_transaction(self, operations, update_last_edited):
 
         if not operations:
             return

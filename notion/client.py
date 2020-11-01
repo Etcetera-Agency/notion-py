@@ -184,7 +184,7 @@ class NotionClient(object):
                 response.json().get(
                     "message", "There was an error (400) submitting the request."
                 )
-            )
+            ) 
         response.raise_for_status()
         return response
 

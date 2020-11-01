@@ -189,7 +189,7 @@ class NotionClient(object):
         return response
 
     def submit_transaction(self, operations, update_last_edited = True):
-        return auto_retry_lambda(_submit_transaction, operations, update_last_edited)
+        return auto_retry_lambda(self._submit_transaction, operations, update_last_edited)
 
     def _submit_transaction(self, operations, update_last_edited):
 

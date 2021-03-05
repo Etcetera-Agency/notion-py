@@ -1,28 +1,38 @@
-from setuptools import setup, find_packages
+import setuptools
 
-with open("README.md") as file:
-    long_description = file.read()
+with open("README.md", "r") as fh:
+    long_description = fh.read()
 
-with open("requirements.txt") as file:
-    r = file.read().split("\n")
-    r = map(lambda l: l.strip(), filter(len, r))
-    r = filter(lambda l: not l.startswith("-"), r)
-    r = filter(lambda l: not l.startswith("#"), r)
-    install_requires = list(r)
 
-setup(
-    name="notion-py",
-    description="(Fork of) Unofficial Python API client for Notion.so",
+def get_requirements(fname):
+    "Takes requirements from requirements.txt and returns a list."
+    with open(fname) as fp:
+        reqs = list()
+        for lib in fp.read().split("\n"):
+            # Ignore pypi flags and comments
+            if not lib.startswith("-") or lib.startswith("#"):
+                reqs.append(lib.strip())
+        return reqs
+
+
+install_requires = get_requirements("requirements.txt")
+
+setuptools.setup(
+    name="notion",
+    version="0.0.28",
+    author="Jamie Alexandre",
+    author_email="jamalex+python@gmail.com",
+    description="Unofficial Python API client for Notion.so",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/Etcetera-Agency/notion-py",
+    url="https://github.com/jamalex/notion-py",
     install_requires=install_requires,
     include_package_data=True,
-    packages=find_packages(),
-    python_requires=">=3.6",
+    packages=setuptools.find_packages(),
+    python_requires=">=3.5",
     classifiers=[
-        "License :: OSI Approved :: MIT License",
         "Programming Language :: Python :: 3",
+        "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
     ],
 )

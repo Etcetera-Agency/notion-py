@@ -2,7 +2,6 @@ import hashlib
 import json
 import re
 import uuid
-import time
 
 from requests import Session, HTTPError
 from requests.cookies import cookiejar_from_dict
@@ -26,7 +25,7 @@ from .settings import API_BASE_URL
 from .space import Space
 from .store import RecordStore
 from .user import User
-from .utils import extract_id, now, auto_retry_lambda
+from .utils import extract_id, now
 
 
 def create_session(client_specified_retry=None):
@@ -40,7 +39,7 @@ def create_session(client_specified_retry=None):
         retry = Retry(
             5,
             backoff_factor=0.3,
-            status_forcelist=(500, 502, 503, 504),
+            status_forcelist=(502, 503, 504),
             # CAUTION: adding 'POST' to this list which is not technically idempotent
             method_whitelist=(
                 "POST",
@@ -159,15 +158,15 @@ class NotionClient(object):
         records = self._update_user_info()
         return [self.get_block(bid) for bid in records["block"].keys()]
 
-    def get_record_data(self, table, id, force_refresh=False):
-        return self._store.get(table, id, force_refresh=force_refresh)
+    def get_record_data(self, table, id, force_refresh=False, limit=100):
+        return self._store.get(table, id, force_refresh=force_refresh, limit=limit)
 
-    def get_block(self, url_or_id, force_refresh=False):
+    def get_block(self, url_or_id, force_refresh=False, limit=100):
         """
         Retrieve an instance of a subclass of Block that maps to the block/page identified by the URL or ID passed in.
         """
         block_id = extract_id(url_or_id)
-        block = self.get_record_data("block", block_id, force_refresh=force_refresh)
+        block = self.get_record_data("block", block_id, force_refresh=force_refresh, limit=limit)
         if not block:
             return None
         if block.get("parent_table") == "collection":
@@ -262,14 +261,11 @@ class NotionClient(object):
                 response.json().get(
                     "message", "There was an error (400) submitting the request."
                 )
-            ) 
+            )
         response.raise_for_status()
         return response
 
-    def _submit_transaction(self, operations, update_last_edited = True):
-        return auto_retry_lambda(self._submit_transaction, operations, update_last_edited)
-
-    def submit_transaction(self, operations, update_last_edited = True):
+    def submit_transaction(self, operations, update_last_edited=True):
 
         if not operations:
             return
@@ -310,11 +306,11 @@ class NotionClient(object):
         """
         return hasattr(self, "_transaction_operations")
 
-    def search_pages_with_parent(self, parent_id, search=""):
+    def search_pages_with_parent(self, parent_id, search="", limit=100):
         data = {
             "query": search,
             "parentId": parent_id,
-            "limit": 100,
+            "limit": limit,
             "spaceId": self.current_space.id,
         }
         response = self.post("searchPagesWithParent", data).json()

@@ -360,7 +360,7 @@ class CollectionQuery(object):
         sort=[],
         calendar_by="",
         group_by="",
-        limit=100
+        limit=10_000
     ):
         assert not (
             aggregate and aggregations
